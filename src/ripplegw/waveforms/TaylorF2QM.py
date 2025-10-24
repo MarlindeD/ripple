@@ -1,11 +1,11 @@
-"""This file implements the TaylorF2 waveform."""
+"""This file implements the TaylorF2QM waveform."""
 import jax
 import jax.numpy as jnp
 
 from ..constants import EulerGamma, gt, m_per_Mpc, C, PI, MRSUN
 from ..typing import Array
-from ripple import Mc_eta_to_ms, ms_to_Mc_eta, lambda_tildes_to_lambdas, lambdas_to_lambda_tildes
-from .utils_tidal import *
+from ripplegw import Mc_eta_to_ms, ms_to_Mc_eta, lambda_tildes_to_lambdas, lambdas_to_lambda_tildes
+from .TaylorF2QM_utils import *
 
 # All auxiliary functions to get the required coefficients for TaylorF2:
 def get_3PNSOCoeff(mByM):
