@@ -225,6 +225,10 @@ def f_contact(m1, m2, R1, R2):
     ## Eqation 14 of Agathos et al ##
     return 1/PI * (M / R**3)**(1/2)
 
+def f_contact_ECO(m1, m2, C1, C2):
+    f_ISCO_BBH = f_ISCO(m1, m2)
+    return (C1 + C2)**(3/2) * f_ISCO_BBH
+
 def f_RLO(m1, m2):
     """
     m1, m2: masses of the two objects in solar mass
@@ -363,7 +367,11 @@ def get_spin_induced_quadrupole_phase(v: Array, theta: Array) -> Array:
     # See http://arxiv.org/   abs/1503.05405, around eq (11)
     
     # Get parameters and auxiliary variables
-    m1, m2, chi1, chi2, lambda1, lambda2 = theta 
+    try:
+        m1, m2, chi1, chi2, lambda1, lambda2 = theta 
+    except:
+        #If compactness is given as a parameter, ignore it
+        m1, m2, chi1, chi2, lambda1, lambda2, _, _ = theta 
     M  = m1 + m2
     X1 = m1 / M
     X2 = m2 / M
