@@ -169,7 +169,7 @@ def get_PNPhasing_F2(m1: float, m2: float, S1z: float, S2z: float, lambda1: floa
     return phasing_coeffs, phasing_log_coeffs
 
 
-def gen_TaylorF2(f: Array, params: Array, f_ref: float, stop:str="None", use_lambda_tildes: bool = True):
+def gen_TaylorF2QM(f: Array, params: Array, f_ref: float, stop:str="None", use_lambda_tildes: bool = True):
     """
     Generate TaylorF2 frequency domain waveform 
     
@@ -208,12 +208,12 @@ def gen_TaylorF2(f: Array, params: Array, f_ref: float, stop:str="None", use_lam
         theta_intrinsic = jnp.array([m1, m2, params[2], params[3], lambda1, lambda2, params[6], params[7]])
         theta_extrinsic = jnp.array([params[8], params[9], params[10]])
     
-    h0 = _gen_TaylorF2(f, theta_intrinsic, theta_extrinsic, f_ref, stop=stop)
+    h0 = _gen_TaylorF2QM(f, theta_intrinsic, theta_extrinsic, f_ref, stop=stop)
     
     return h0
 
 
-def gen_TaylorF2_hphc(f: Array, params: Array, f_ref: float, use_lambda_tildes: bool = True, stop:str="None"):
+def gen_TaylorF2QM_hphc(f: Array, params: Array, f_ref: float, use_lambda_tildes: bool = True, stop:str="None"):
     """
     Generate PhenomD frequency domain waveform following 1508.07253.
     vars array contains both intrinsic and extrinsic variables
@@ -237,14 +237,14 @@ def gen_TaylorF2_hphc(f: Array, params: Array, f_ref: float, use_lambda_tildes: 
         hc (array): Strain of the cross polarization
     """
     iota = params[-1]
-    h0 = gen_TaylorF2(f, params, f_ref, stop, use_lambda_tildes=use_lambda_tildes)
+    h0 = gen_TaylorF2QM(f, params, f_ref, stop, use_lambda_tildes=use_lambda_tildes)
 
     hp = h0 * (1 / 2 * (1 + jnp.cos(iota) ** 2))
     hc = -1j * h0 * jnp.cos(iota)
     
     return hp, hc
 
-def _gen_TaylorF2(
+def _gen_TaylorF2QM(
     f: Array,
     theta_intrinsic: Array,
     theta_extrinsic: Array,
