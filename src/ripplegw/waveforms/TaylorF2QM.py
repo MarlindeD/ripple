@@ -421,8 +421,11 @@ def _gen_TaylorF2QM(
     elif stop == "ISCO":
         f_stop = f_ISCO(m1, m2)
     elif stop == "contact ECO":
-        f_stop = f_contact_ECO(m1, m2, C1, C2)
-        f_stop 
+        if C1 == None or C2 == None:
+            print("No compactness given, defaulting to ISCO")
+            f_stop = f_ISCO(m1, m2)
+        else:
+            f_stop = f_contact_ECO(m1, m2, C1, C2) 
     else:
         h0 = amp * jnp.cos(phasing - PI/4) - amp * jnp.sin(phasing - PI/4) * 1.0j
         return h0
