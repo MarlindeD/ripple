@@ -359,7 +359,7 @@ def get_spin_induced_quadrupole_phase(v: Array, theta: Array) -> Array:
 
     Args:
         v (Array): Array of velocities, that is, v = (pi M f)^(1/3)
-        theta (Array): Array of parameters (m1, m2, chi1, chi2, lambda1, lambda2)   
+        theta (Array): Array of parameters (m1, m2, chi1, chi2, lambda1, lambda2, f_stop, a1, a2)   
 
     Returns:
         Array: Phase contribution from spin-induced quadrupole moment
@@ -368,18 +368,17 @@ def get_spin_induced_quadrupole_phase(v: Array, theta: Array) -> Array:
     
     # Get parameters and auxiliary variables
     try:
-        m1, m2, chi1, chi2, lambda1, lambda2 = theta 
+        m1, m2, chi1, chi2, _, _, _, a1, a2 = theta 
     except:
-        #If compactness is given as a parameter, ignore it
-        m1, m2, chi1, chi2, lambda1, lambda2, _, _ = theta 
+        print("One of the intrinsic parameters is not specified! Check if you added a1 and/or a2")
     M  = m1 + m2
     X1 = m1 / M
     X2 = m2 / M
     eta = m1 * m2 / (M ** 2.0)
     
     # Compute the spin-induced quadrupole phase (NOTE this is assuming aligned spin)
-    a1 = _get_spin_induced_quadrupole_phase_coeff(lambda1, m1)
-    a2 = _get_spin_induced_quadrupole_phase_coeff(lambda2, m2)
+    #a1 = _get_spin_induced_quadrupole_phase_coeff(lambda1, m1)
+    #a2 = _get_spin_induced_quadrupole_phase_coeff(lambda2, m2)
     sigma_qm_1 = 5 * a1 * (X1 ** 2) * chi1 ** 2
     sigma_qm_2 = 5 * a2 * (X2 ** 2) * chi2 ** 2
     

@@ -174,17 +174,19 @@ def gen_TaylorF2QM(f: Array, params: Array, f_ref: float, stop:str="None", use_l
     Generate TaylorF2 frequency domain waveform 
     
     vars array contains both intrinsic and extrinsic variables
-    theta = [Mchirp, eta, chi1, chi2, lambda1, lambda1, C1, C2, D, tc, phic]
-    Mchirp: Chirp mass of the system [solar masses]
-    eta: Symmetric mass ratio [between 0.0 and 0.25]
-    chi1: Dimensionless aligned spin of the primary object [between -1 and 1]
-    chi2: Dimensionless aligned spin of the secondary object [between -1 and 1]
-    lambda tilde: Dimensionless tidal deformability first object [between 0 and 5000]
-    delta lamda tilde: Dimensionless tidal deformability second object [between 0 and 5000]
-    f_stop: stopping frequency
-    D: Luminosity distance to source [Mpc]
-    tc: Time of coalesence. This only appears as an overall linear in f contribution to the phase
-    phic: Phase of coalesence
+    theta = [Mchirp, eta, chi1, chi2, lambda1, lambda1, f_stop, a1, a2, D, tc, phic]
+    Mchirp [0]:         Chirp mass of the system [solar masses]
+    eta [1]:            Symmetric mass ratio [between 0.0 and 0.25]
+    chi1 [2]:           Dimensionless aligned spin of the primary object [between -1 and 1]
+    chi2 [3]:           Dimensionless aligned spin of the secondary object [between -1 and 1]
+    lambda tilde[4]:    Dimensionless tidal deformability first object [between 0 and 5000]
+    del lamda tilde[5]: Dimensionless tidal deformability second object [between 0 and 5000]
+    f_stop [6]:         stopping frequency
+    a1 [7]:             QM parameter of the primary object
+    a2 [8]:             QM parameter of the secondary object
+    D [9]:              Luminosity distance to source [Mpc]
+    tc [10]:            Time of coalesence. This only appears as an overall linear in f contribution to the phase
+    phic [11]:          Phase of coalesence
 
     f_ref: Reference frequency for the waveform
 
@@ -199,8 +201,8 @@ def gen_TaylorF2QM(f: Array, params: Array, f_ref: float, stop:str="None", use_l
     else:
         lambda1, lambda2 = params[4], params[5]
 
-    theta_intrinsic = jnp.array([m1, m2, params[2], params[3], lambda1, lambda2, params[6]])
-    theta_extrinsic = jnp.array([params[7], params[8], params[9]])
+    theta_intrinsic = jnp.array([m1, m2, params[2], params[3], lambda1, lambda2, params[6], params[7], params[8]])
+    theta_extrinsic = jnp.array([params[9], params[10], params[11]])
     
     h0 = _gen_TaylorF2QM(f, theta_intrinsic, theta_extrinsic, f_ref, stop=stop)
     
@@ -211,18 +213,20 @@ def gen_TaylorF2QM_hphc(f: Array, params: Array, f_ref: float, use_lambda_tildes
     """
     Generate PhenomD frequency domain waveform following 1508.07253.
     vars array contains both intrinsic and extrinsic variables
-    theta = [Mchirp, eta, chi1, chi2, D, tc, phic]
-    Mchirp: Chirp mass of the system [solar masses]
-    eta: Symmetric mass ratio [between 0.0 and 0.25]
-    chi1: Dimensionless aligned spin of the primary object [between -1 and 1]
-    chi2: Dimensionless aligned spin of the secondary object [between -1 and 1]
-    lambda1: Dimensionless tidal deformability of the primary object [between 0 and 5000]
-    lambda2: Dimensionless tidal deformability of the secondary object [between 0 and 5000]
-    f_stop: stopping frequency
-    D: Luminosity distance to source [Mpc]
-    tc: Time of coalesence. This only appears as an overall linear in f contribution to the phase
-    phic: Phase of coalesence
-    inclination: Inclination angle of the binary [between 0 and PI]
+    theta = [Mchirp, eta, chi1, chi2, lambda1, lambda1, f_stop, a1, a2, D, tc, phic]
+    Mchirp [0]:         Chirp mass of the system [solar masses]
+    eta [1]:            Symmetric mass ratio [between 0.0 and 0.25]
+    chi1 [2]:           Dimensionless aligned spin of the primary object [between -1 and 1]
+    chi2 [3]:           Dimensionless aligned spin of the secondary object [between -1 and 1]
+    lambda tilde[4]:    Dimensionless tidal deformability first object [between 0 and 5000]
+    del lamda tilde[5]: Dimensionless tidal deformability second object [between 0 and 5000]
+    f_stop [6]:         stopping frequency
+    a1 [7]:             QM parameter of the primary object
+    a2 [8]:             QM parameter of the secondary object
+    D [9]:              Luminosity distance to source [Mpc]
+    tc [10]:            Time of coalesence. This only appears as an overall linear in f contribution to the phase
+    phic [11]:          Phase of coalesence
+    inclination [12]:   Inclination angle of the binary [between 0 and PI]
 
     f_ref: Reference frequency for the waveform
 
@@ -254,23 +258,25 @@ def _gen_TaylorF2QM(
     Args:
         f (Array): Frequencies at which GW must be evaluated (Hz)
         theta_intrinsic (Array): Intrinsic parameters: 
-            component mass 1 [M_sun], 
-            component mass 2 [M_sun], 
-            spin 1 z-component, 
-            spin 2 z-component, 
-            dimensionless tidal deformability 1, 
-            dimensionless tidal deformability 2,
-            stopping frequency,
+            [0] component mass 1 [M_sun], 
+            [1] component mass 2 [M_sun], 
+            [2] spin 1 z-component, 
+            [3] spin 2 z-component, 
+            [4] dimensionless tidal deformability 1, 
+            [5] dimensionless tidal deformability 2,
+            [6] stopping frequency,
+            [7] QM parameter 1,
+            [8] QM parameter 2
         theta_extrinsic (Array): Extrinsic parameters:
-            dist_mpc, 
-            tc, 
-            phic
+            [0] dist_mpc, 
+            [1] tc, 
+            [2] phic
         f_ref (float): Reference frequency
 
     Returns:
         Array: GW strain, evaluated at given frequencies
     """
-    m1, m2, chi1, chi2, lambda1, lambda2, f_stop = theta_intrinsic
+    m1, m2, chi1, chi2, lambda1, lambda2, f_stop, a1, a2 = theta_intrinsic
     dist_mpc, tc, phi_ref = theta_extrinsic
     m1_s = m1 * gt
     m2_s = m2 * gt
@@ -390,9 +396,8 @@ def _gen_TaylorF2QM(
     
     shft = 2 * PI * tc
 
-    # TO DO: Add spin-induced quadrupole moment
-    #phase_qm = get_spin_induced_quadrupole_phase(v, theta_intrinsic)
-    #phasing += shft * f - 2.*phi_ref - ref_phasing + phase_qm
+    phase_qm = get_spin_induced_quadrupole_phase(v, theta_intrinsic)
+    phasing += shft * f - 2.*phi_ref - ref_phasing + phase_qm
     
     amp = amp0 * jnp.sqrt(-dEnergy/flux) * v
 
